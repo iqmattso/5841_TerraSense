@@ -9,13 +9,13 @@ Different terrains however, have different surface conditions, and as the terrai
 
 ## Implementation & Pipeline
 
-![Alt Text](/Project_Work/artifacts/unitree_go.jpeg)
+![Alt Text](/artifacts/unitree_go.jpeg)
 
 A Unitree Go1 Quadruped was used as the data collection platform, and am inexpensive, off the shelf Intel Realsense d435i depth camera was mounted looking forward.  An external camera was used to demonstrate functionality that can be applied beyond specific sensors on the Unitree Go1.  Data was collected using the Realsense ROS driver on ROS Melodic, and saved as a series of ROS bags.
 
 Images were extracted from ROS bags using `bag2image.py`, and pointclouds were processed into .csv files of each ROS PointCloud2 message.  Each .csv row contains individual points where columns represent X, Y, Z, and Intensity of returned points.
 
-![Alt Text](/Project_Work/artifacts/Data_Flow_Diagramme.png)
+![Alt Text](/artifacts/Data_Flow_Diagramme.png)
 
 ## How to get setup
 
