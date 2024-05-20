@@ -4,14 +4,6 @@ This document describes the method used to connect to a unitree go1 from a PC an
 
 ---
 
-## Table of Contents
-
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
----
-
 ## Installing and configuring ROS1 Melodic
 
 ROS installation was performed per the [official ROS wiki](https://wiki.ros.org/melodic/Installation/Ubuntu) however the specific instructions followed will be detailed here.
@@ -24,7 +16,7 @@ Run this to set up the appropriate repositories
 
 ### Set Up Keys
 Run this to set up the appropriate Keys
-`sudo apt install curl # if you haven't already installed curl`
+`sudo apt install curl`
 `curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -`
 
 ### Installation
@@ -105,6 +97,87 @@ This can be added to bashrc like the previous source file, or ran again every ti
 
 Done. (hopefully)
 
-## Connecting PC to GO1 Network
-This is the 
+## Connecting PC to GO1  Internal Network
+This is the portion where the PC needs to connect to the network switch of the GO1. You can reference [this document](https://docs.trossenrobotics.com/unitree_go1_docs/getting_started/network.html), however there are a few typos, and the specific instructinos followed have been detailed here:
 
+This is useful for this task as well as "SSH-ing" and other utilities
+
+Start by connecting a ubuntu 18.04 laptop and the GO1 together with a ethernet cable.
+
+Ensure the GO1 is fully powered on.
+
+Now it will almost certainly refuse the connection.
+
+Open settings and see if it is possible to determine what ethernet device id the laptop's ethernet port is.
+
+It may be something like "enp5s0" or something along those lines; it should at least start with "en". If there are multiple, some trial and error may have to be employed to determine the correct one.
+
+Now open a terminal.
+
+Type `ifconfig`
+You may need to install ifconfig if it is not already installed
+
+it will spit out a list of all the interfaces on the computer and their status
+
+Something like this:
+```
+enp5s0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.193  netmask 255.255.255.0  broadcast 192.168.0.255
+
+wlp0s20f3: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 192.168.0.183  netmask 255.255.255.0  broadcast 192.168.0.255
+```
+
+In the case of this example `enp5s0` is the port the go1 is connected to
+
+Run the following code to configure the port. Replace `enp5s0` with whatever the port is on the specific machine you are running
+
+`sudo ifconfig enp5s0 down`
+`sudo ifconfig enp5s0 192.168.123.162/24`
+`sudo ifconfig enp5s0 up`
+
+This turns off the port, configures a static IP, then turns the port back on
+
+Now test the configuration by pinging the onboard rPi.
+
+`ping -c 3 192.168.123.161`
+
+Done. (hopefully)
+
+### SSH into specific computer
+This is not required for running the examples, but it may be neccesary to SSH into the various onboard computers on the GO1.
+
+a [Network layout diagram](https://unitree.droneblocks.io/learning/go1-system-architecture) can be viewed here for reference, detailing the IPs of the various onboard computers.
+
+To ssh into a computer on the go1 determine the IP from the network layout diagram and ensure the above steps regarding connecting to the internal network are followed. 
+
+For logging into the onboard rPi
+```
+ssh pi@192.168.123.161 # PW is 123
+```
+
+For logging into the onboard Nanos
+```
+ssh unitree@192.168.123.xx # PW is 123, xx can be 13, 14, or 15 depending on which nano it is desired to connect to
+```
+
+## Running an Example
+Now that the robot is connected to the PC and powered on we can run the example code (hopefully).
+
+Open a new terminal and run this line, which launches the high level UDP connection node for GO1
+
+`roslaunch unitree_legged_real real.launch ctrl_level:=highlevel`
+
+Now open a new terminal window and run the state_sub demo
+
+`rosrun unitree_legged_real state_sub`
+
+Now run the example_walk demo, the robot will move during this demo, ensure it is in area with plenty or space and standing up
+
+`rosrun unitree_legged_real example_walk`
+
+The robot should walk around for a little while and demonstrate some capabilities
+
+The example runs for about a minute or less.
+
+Success (hopefully)
